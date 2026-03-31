@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.messenger.ChatActivity;
 import com.example.messenger.R;
 import com.example.messenger.adapters.UsersAdapter;
-import com.example.messenger.models.User;
 import com.example.messenger.network.ApiClient;
 import com.example.messenger.network.ApiService;
 import com.example.messenger.utils.PreferencesManager;
@@ -31,7 +30,7 @@ public class ChatsFragment extends Fragment {
 
     private RecyclerView rvUsers;
     private UsersAdapter adapter;
-    private List<User> userList = new ArrayList<>();
+    private List<ApiService.UserSearchResult> userList = new ArrayList<>();
     private PreferencesManager prefManager;
     private EditText etSearch;
 
@@ -48,7 +47,7 @@ public class ChatsFragment extends Fragment {
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new UsersAdapter(userList, user -> {
             Intent intent = new Intent(getContext(), ChatActivity.class);
-            intent.putExtra("withUser", user.getUsername());
+            intent.putExtra("withUser", user.username);
             startActivity(intent);
         });
         rvUsers.setAdapter(adapter);
@@ -70,19 +69,17 @@ public class ChatsFragment extends Fragment {
             adapter.notifyDataSetChanged();
             return;
         }
-        ApiClient.getApi().searchUsers("Bearer " + prefManager.getToken(), query).enqueue(new Callback<List<String>>() {
+        ApiClient.getApi().searchUsers("Bearer " + prefManager.getToken(), query).enqueue(new Callback<List<ApiService.UserSearchResult>>() {
             @Override
-            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+            public void onResponse(Call<List<ApiService.UserSearchResult>> call, Response<List<ApiService.UserSearchResult>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     userList.clear();
-                    for (String username : response.body()) {
-                        userList.add(new User(username));
-                    }
+                    userList.addAll(response.body());
                     adapter.notifyDataSetChanged();
                 }
             }
             @Override
-            public void onFailure(Call<List<String>> call, Throwable t) {
+            public void onFailure(Call<List<ApiService.UserSearchResult>> call, Throwable t) {
                 Toast.makeText(getContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show();
             }
         });
