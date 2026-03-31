@@ -62,18 +62,15 @@ public class EmailVerificationActivity extends AppCompatActivity {
         
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Введите email");
-            etEmail.requestFocus();
             return;
         }
         
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Введите корректный email");
-            etEmail.requestFocus();
             return;
         }
 
         btnSendCode.setEnabled(false);
-        btnSendCode.setText("Отправка...");
         tvStatus.setText("Отправка кода...");
 
         ApiService.SendCodeRequest req = new ApiService.SendCodeRequest();
@@ -92,7 +89,6 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Ошибка";
                     tvStatus.setText(msg);
                     btnSendCode.setEnabled(true);
-                    btnSendCode.setText("Отправить код");
                     Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
                 }
             }
@@ -101,8 +97,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
             public void onFailure(Call<ApiService.SimpleResponse> call, Throwable t) {
                 tvStatus.setText("Ошибка сети");
                 btnSendCode.setEnabled(true);
-                btnSendCode.setText("Отправить код");
-                Toast.makeText(EmailVerificationActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(EmailVerificationActivity.this, "Ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -113,18 +108,15 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(code)) {
             etCode.setError("Введите код");
-            etCode.requestFocus();
             return;
         }
         
         if (code.length() != 6) {
             etCode.setError("Код должен состоять из 6 цифр");
-            etCode.requestFocus();
             return;
         }
 
         btnVerify.setEnabled(false);
-        btnVerify.setText("Проверка...");
         tvStatus.setText("Проверка кода...");
 
         ApiService.VerifyCodeRequest req = new ApiService.VerifyCodeRequest();
@@ -154,7 +146,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     
                     Toast.makeText(EmailVerificationActivity.this, "Вход выполнен!", Toast.LENGTH_SHORT).show();
                     
-                    // Переходим в главное меню
+                    // Переход в главное меню
                     Intent intent = new Intent(EmailVerificationActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -163,7 +155,6 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Неверный код";
                     tvStatus.setText(msg);
                     btnVerify.setEnabled(true);
-                    btnVerify.setText("Подтвердить");
                     Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
                 }
             }
@@ -172,7 +163,6 @@ public class EmailVerificationActivity extends AppCompatActivity {
             public void onFailure(Call<ApiService.VerifyCodeResponse> call, Throwable t) {
                 tvStatus.setText("Ошибка сети");
                 btnVerify.setEnabled(true);
-                btnVerify.setText("Подтвердить");
                 Toast.makeText(EmailVerificationActivity.this, "Ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
