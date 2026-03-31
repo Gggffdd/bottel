@@ -65,13 +65,11 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_LONG).show();
                 }
             }
+
             @Override
             public void onFailure(Call<ApiService.LoginResponse> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
-        });
-    }
-}
         });
     }
 }
