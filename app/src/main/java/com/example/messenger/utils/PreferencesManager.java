@@ -7,6 +7,7 @@ public class PreferencesManager {
     private static final String PREF_NAME = "messenger";
     private static final String KEY_TOKEN = "token";
     private static final String KEY_USERNAME = "username";
+    private static final String KEY_DISPLAY_NAME = "display_name";
     private static final String KEY_BIO = "bio";
     private static final String KEY_BIRTHDAY = "birthday";
     private static final String KEY_AVATAR_URI = "avatar_uri";
@@ -28,7 +29,11 @@ public class PreferencesManager {
     public boolean isLoggedIn() { return getToken() != null; }
     public void clear() { prefs.edit().clear().apply(); }
 
+    public void saveDisplayName(String name) { prefs.edit().putString(KEY_DISPLAY_NAME, name).apply(); }
+    public String getDisplayName() { return prefs.getString(KEY_DISPLAY_NAME, getUsername()); }
+    
     public void saveUsername(String username) { prefs.edit().putString(KEY_USERNAME, username).apply(); }
+    
     public void saveBio(String bio) { prefs.edit().putString(KEY_BIO, bio).apply(); }
     public String getBio() { return prefs.getString(KEY_BIO, ""); }
     
