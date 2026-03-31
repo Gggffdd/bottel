@@ -1,87 +1,180 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
-    android:background="@color/white">
+package com.example.messenger;
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Messenger"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="@color/telegram_blue"
-        android:layout_marginBottom="48dp" />
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.messenger.network.ApiClient;
+import com.example.messenger.network.ApiService;
+import com.example.messenger.utils.PreferencesManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="@color/telegram_blue"
-        app:hintTextColor="@color/telegram_blue"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp"
-        app:placeholderText="example@mail.com"
-        app:placeholderTextColor="@color/gray_text">
+public class EmailVerificationActivity extends AppCompatActivity {
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text" />
-    </com.google.android.material.textfield.TextInputLayout>
+    private EditText etEmail, etCode;
+    private Button btnSendCode, btnVerify;
+    private TextView tvStatus;
+    private PreferencesManager prefManager;
 
-    <Button
-        android:id="@+id/btnSendCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Отправить код"
-        android:backgroundTint="@color/telegram_blue"
-        android:layout_marginTop="16dp" />
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        prefManager = new PreferencesManager(this);
+        applyTheme();
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_email_verification);
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Код из письма"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="@color/telegram_blue"
-        app:hintTextColor="@color/telegram_blue"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp"
-        android:layout_marginTop="24dp"
-        app:placeholderText="6 цифр"
-        app:placeholderTextColor="@color/gray_text">
+        // Проверяем, не залогинен ли уже пользователь
+        if (prefManager.isLoggedIn()) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gray_text" />
-    </com.google.android.material.textfield.TextInputLayout>
+        etEmail = findViewById(R.id.etEmail);
+        etCode = findViewById(R.id.etCode);
+        btnSendCode = findViewById(R.id.btnSendCode);
+        btnVerify = findViewById(R.id.btnVerify);
+        tvStatus = findViewById(R.id.tvStatus);
 
-    <Button
-        android:id="@+id/btnVerify"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Подтвердить"
-        android:backgroundTint="@color/telegram_blue"
-        android:enabled="false"
-        android:layout_marginTop="16dp" />
+        btnSendCode.setOnClickListener(v -> sendCode());
+        btnVerify.setOnClickListener(v -> verifyCode());
+        
+        etEmail.requestFocus();
+    }
+    
+    private void applyTheme() {
+        String theme = prefManager.getTheme();
+        if (theme.equals("dark")) {
+            setTheme(R.style.Theme_Messenger_Dark);
+        } else {
+            setTheme(R.style.Theme_Messenger);
+        }
+    }
 
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="12sp"
-        android:textColor="@color/gray_text" />
-</LinearLayout>
+    private void sendCode() {
+        String email = etEmail.getText().toString().trim();
+        
+        if (TextUtils.isEmpty(email)) {
+            etEmail.setError("Введите email");
+            etEmail.requestFocus();
+            return;
+        }
+        
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Введите корректный email");
+            etEmail.requestFocus();
+            return;
+        }
+
+        btnSendCode.setEnabled(false);
+        btnSendCode.setText("Отправка...");
+        tvStatus.setText("Отправка кода...");
+
+        ApiService.SendCodeRequest req = new ApiService.SendCodeRequest();
+        req.email = email;
+
+        ApiClient.getApi().sendCode(req).enqueue(new Callback<ApiService.SimpleResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.SimpleResponse> call, Response<ApiService.SimpleResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success) {
+                    tvStatus.setText("Код отправлен на " + email);
+                    btnSendCode.setEnabled(false);
+                    btnVerify.setEnabled(true);
+                    etCode.requestFocus();
+                    Toast.makeText(EmailVerificationActivity.this, "Код отправлен! Проверьте почту", Toast.LENGTH_LONG).show();
+                } else {
+                    String msg = response.body() != null && response.body().error != null ? response.body().error : "Ошибка";
+                    tvStatus.setText(msg);
+                    btnSendCode.setEnabled(true);
+                    btnSendCode.setText("Отправить код");
+                    Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiService.SimpleResponse> call, Throwable t) {
+                tvStatus.setText("Ошибка сети");
+                btnSendCode.setEnabled(true);
+                btnSendCode.setText("Отправить код");
+                Toast.makeText(EmailVerificationActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void verifyCode() {
+        String email = etEmail.getText().toString().trim();
+        String code = etCode.getText().toString().trim();
+
+        if (TextUtils.isEmpty(code)) {
+            etCode.setError("Введите код");
+            etCode.requestFocus();
+            return;
+        }
+        
+        if (code.length() != 6) {
+            etCode.setError("Код должен состоять из 6 цифр");
+            etCode.requestFocus();
+            return;
+        }
+
+        btnVerify.setEnabled(false);
+        btnVerify.setText("Проверка...");
+        tvStatus.setText("Проверка кода...");
+
+        ApiService.VerifyCodeRequest req = new ApiService.VerifyCodeRequest();
+        req.email = email;
+        req.code = code;
+
+        ApiClient.getApi().verifyCode(req).enqueue(new Callback<ApiService.VerifyCodeResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.VerifyCodeResponse> call, Response<ApiService.VerifyCodeResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success) {
+                    ApiService.VerifyCodeResponse resp = response.body();
+                    
+                    // Сохраняем данные пользователя
+                    if (resp.user != null) {
+                        prefManager.saveUserData(
+                            resp.user.email,
+                            resp.user.username,
+                            resp.user.displayName != null ? resp.user.displayName : resp.user.username,
+                            resp.user.bio != null ? resp.user.bio : "",
+                            resp.user.birthday != null ? resp.user.birthday : "",
+                            resp.user.avatar != null ? resp.user.avatar : "",
+                            resp.user.theme != null ? resp.user.theme : "light"
+                        );
+                    } else {
+                        prefManager.saveUser(email, resp.token);
+                    }
+                    
+                    Toast.makeText(EmailVerificationActivity.this, "Вход выполнен!", Toast.LENGTH_SHORT).show();
+                    
+                    // Переходим в главное меню
+                    Intent intent = new Intent(EmailVerificationActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    String msg = response.body() != null && response.body().error != null ? response.body().error : "Неверный код";
+                    tvStatus.setText(msg);
+                    btnVerify.setEnabled(true);
+                    btnVerify.setText("Подтвердить");
+                    Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiService.VerifyCodeResponse> call, Throwable t) {
+                tvStatus.setText("Ошибка сети");
+                btnVerify.setEnabled(true);
+                btnVerify.setText("Подтвердить");
+                Toast.makeText(EmailVerificationActivity.this, "Ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
