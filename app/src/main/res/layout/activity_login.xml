@@ -21,12 +21,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Номер телефона (+71234567890)"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxStrokeColor="#3399ff"
+        app:hintTextColor="#3399ff"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="phone" />
+            android:inputType="phone"
+            android:textColor="#000000"
+            android:textColorHint="#8E8E93" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -34,12 +41,19 @@
         android:layout_height="wrap_content"
         android:hint="Пароль"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:passwordToggleEnabled="true">
+        app:passwordToggleEnabled="true"
+        app:boxStrokeColor="#3399ff"
+        app:hintTextColor="#3399ff"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="#000000"
+            android:textColorHint="#8E8E93" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
