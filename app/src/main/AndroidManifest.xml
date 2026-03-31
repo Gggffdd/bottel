@@ -12,18 +12,17 @@
         android:theme="@style/Theme.Messenger"
         android:usesCleartextTraffic="true">
         
-        <activity android:name=".PhoneVerificationActivity" android:exported="true">
+        <activity android:name=".LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-        <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".RegisterActivity" android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".ChatActivity" android:exported="false" />
-        <activity android:name=".ProfileEditActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".ProfileEditActivity" />
         
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,6 +33,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+    </application>
+
+</manifest>
     </application>
 
 </manifest>
