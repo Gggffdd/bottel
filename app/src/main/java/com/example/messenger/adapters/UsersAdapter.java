@@ -33,17 +33,25 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ApiService.UserSearchResult user = users.get(position);
-        String displayName = user.displayName != null ? user.displayName : user.username;
+        
+        // Показываем имя (displayName) или username, если имя не задано
+        String displayName = user.displayName != null && !user.displayName.isEmpty() 
+            ? user.displayName 
+            : user.username;
         holder.tvDisplayName.setText(displayName);
         holder.tvUsername.setText("@" + user.username);
+        
         holder.itemView.setOnClickListener(v -> listener.onUserClick(user));
     }
 
     @Override
-    public int getItemCount() { return users.size(); }
+    public int getItemCount() {
+        return users.size();
+    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvDisplayName, tvUsername;
+
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDisplayName = itemView.findViewById(R.id.tvDisplayName);
