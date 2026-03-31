@@ -38,3 +38,9 @@ dependencies {
     implementation("io.socket:socket.io-client:2.0.1")
     implementation("com.google.code.gson:gson:2.10.1")
 }
+
+repositories {
+    mavenCentral()
+    google()
+    maven { url = uri("https://jitpack.io") }
+}
