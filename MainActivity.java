@@ -59,3 +59,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchUsers(String query) {
+        if (query.isEmpty()) {
+            userList.clear();
+            adapter.notifyDataSetChanged();
+            return;
+        }
+        ApiClient.getApi().searchUsers("Bearer " + prefManager.getToken(), query).enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    userList.clear();
+                    for (String username : response.body()) {
+                        userList.add(new User(username));
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Ошибка поиска", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
