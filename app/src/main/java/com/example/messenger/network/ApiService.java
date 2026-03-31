@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ApiService {
 
-    // Регистрация и логин (остаются для обратной совместимости)
+    // Регистрация и логин
     @POST("api/register")
     Call<LoginResponse> register(@Body RegisterRequest request);
 
@@ -30,12 +30,16 @@ public interface ApiService {
     @POST("api/profile")
     Call<SimpleResponse> updateProfile(@Header("Authorization") String auth, @Body ProfileRequest request);
 
-    // ========== НОВЫЕ МЕТОДЫ ДЛЯ EMAIL-ВЕРИФИКАЦИИ ==========
+    // Email верификация
     @POST("api/send-code")
     Call<SimpleResponse> sendCode(@Body SendCodeRequest request);
 
     @POST("api/verify-code")
     Call<VerifyCodeResponse> verifyCode(@Body VerifyCodeRequest request);
+
+    // Проверка уникальности username
+    @POST("api/check-username")
+    Call<UsernameCheckResponse> checkUsername(@Header("Authorization") String auth, @Body UsernameCheckRequest request);
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ==========
 
@@ -64,6 +68,7 @@ public interface ApiService {
         public String bio;
         public String birthday;
         public String avatar;
+        public String theme;
     }
 
     class ProfileResponse {
@@ -73,6 +78,7 @@ public interface ApiService {
         public String bio;
         public String birthday;
         public String avatar;
+        public String theme;
     }
 
     class UserSearchResult {
@@ -86,8 +92,7 @@ public interface ApiService {
         public String error;
     }
 
-    // ========== НОВЫЕ КЛАССЫ ДЛЯ EMAIL-ВЕРИФИКАЦИИ ==========
-
+    // Email верификация
     class SendCodeRequest {
         public String email;
     }
@@ -101,6 +106,27 @@ public interface ApiService {
         public boolean success;
         public String token;
         public boolean isNew;
+        public UserData user;
         public String error;
+    }
+
+    class UserData {
+        public String email;
+        public String username;
+        public String displayName;
+        public String bio;
+        public String birthday;
+        public String avatar;
+        public String theme;
+    }
+
+    // Проверка username
+    class UsernameCheckRequest {
+        public String username;
+    }
+
+    class UsernameCheckResponse {
+        public boolean available;
+        public String message;
     }
 }
