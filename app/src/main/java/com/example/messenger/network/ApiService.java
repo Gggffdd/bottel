@@ -8,52 +8,65 @@ import java.util.List;
 
 public interface ApiService {
 
-    // Регистрация и логин
+    // ========== АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ==========
+    
+    // Регистрация (номер + email + пароль)
     @POST("api/register")
     Call<LoginResponse> register(@Body RegisterRequest request);
 
+    // Логин (email + пароль) — старый способ, для совместимости
     @POST("api/login")
     Call<LoginResponse> login(@Body LoginRequest request);
 
-    // Поиск пользователей
+    // ========== EMAIL ВЕРИФИКАЦИЯ ==========
+    
+    // Отправка кода на email
+    @POST("api/send-code")
+    Call<SimpleResponse> sendCode(@Body SendCodeRequest request);
+
+    // Проверка кода
+    @POST("api/verify-code")
+    Call<VerifyCodeResponse> verifyCode(@Body VerifyCodeRequest request);
+
+    // ========== ПОИСК ПОЛЬЗОВАТЕЛЕЙ ==========
+    
     @GET("api/users/search")
     Call<List<UserSearchResult>> searchUsers(@Header("Authorization") String auth, @Query("q") String query);
 
-    // Сообщения
+    // ========== СООБЩЕНИЯ ==========
+    
     @GET("api/messages/{withUser}")
     Call<List<Message>> getMessages(@Header("Authorization") String auth, @Path("withUser") String withUser);
 
-    // Профиль
+    // ========== ПРОФИЛЬ ==========
+    
     @GET("api/profile")
     Call<ProfileResponse> getProfile(@Header("Authorization") String auth);
 
     @POST("api/profile")
     Call<SimpleResponse> updateProfile(@Header("Authorization") String auth, @Body ProfileRequest request);
 
-    // Email верификация
-    @POST("api/send-code")
-    Call<SimpleResponse> sendCode(@Body SendCodeRequest request);
-
-    @POST("api/verify-code")
-    Call<VerifyCodeResponse> verifyCode(@Body VerifyCodeRequest request);
-
-    // Проверка уникальности username
+    // ========== ПРОВЕРКА USERNAME ==========
+    
     @POST("api/check-username")
     Call<UsernameCheckResponse> checkUsername(@Header("Authorization") String auth, @Body UsernameCheckRequest request);
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ==========
 
-    class LoginRequest {
-        public String phone;
-        public String password;
-    }
-
+    // Регистрация
     class RegisterRequest {
         public String phone;
+        public String email;
         public String password;
-        public String username;
     }
 
+    // Логин
+    class LoginRequest {
+        public String email;
+        public String password;
+    }
+
+    // Ответ на логин/регистрацию
     class LoginResponse {
         public boolean success;
         public String token;
@@ -62,6 +75,7 @@ public interface ApiService {
         public String error;
     }
 
+    // Профиль
     class ProfileRequest {
         public String displayName;
         public String username;
@@ -81,18 +95,21 @@ public interface ApiService {
         public String theme;
     }
 
+    // Результат поиска пользователя
     class UserSearchResult {
         public String username;
         public String displayName;
     }
 
+    // Простой ответ (успех/ошибка)
     class SimpleResponse {
         public boolean success;
         public String message;
         public String error;
     }
 
-    // Email верификация
+    // ========== EMAIL ВЕРИФИКАЦИЯ ==========
+
     class SendCodeRequest {
         public String email;
     }
@@ -120,7 +137,8 @@ public interface ApiService {
         public String theme;
     }
 
-    // Проверка username
+    // ========== ПРОВЕРКА USERNAME ==========
+
     class UsernameCheckRequest {
         public String username;
     }
