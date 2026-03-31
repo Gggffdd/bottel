@@ -10,13 +10,44 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/ivAvatar"
+        <FrameLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_default_avatar"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_default_avatar" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_add_photo"
+                android:background="@color/white"
+                android:padding="4dp"
+                android:backgroundTint="@color/telegram_blue" />
+
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Имя"
+            android:textColor="@color/gray_text"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/etDisplayName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ваше имя"
+            android:padding="12dp"
+            android:background="@drawable/border"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
