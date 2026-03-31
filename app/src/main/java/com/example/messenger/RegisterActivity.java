@@ -15,7 +15,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
-    private EditText etPhone, etUsername, etPassword;
+    private EditText etPhone, etPassword;
     private Button btnRegister;
     private TextView tvInfo;
 
@@ -25,34 +25,26 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         etPhone = findViewById(R.id.etPhone);
-        etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnRegister = findViewById(R.id.btnRegister);
         tvInfo = findViewById(R.id.tvInfo);
 
         btnRegister.setOnClickListener(v -> {
             String phone = etPhone.getText().toString().trim();
-            String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
-            if (phone.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            if (phone.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!username.matches("^[a-zA-Z0-9_]+$")) {
-                tvInfo.setText("Username может содержать только буквы, цифры и _");
-                return;
-            }
-
-            register(phone, username, password);
+            register(phone, password);
         });
     }
 
-    private void register(String phone, String username, String password) {
+    private void register(String phone, String password) {
         ApiService.RegisterRequest req = new ApiService.RegisterRequest();
         req.phone = phone;
-        req.username = username;
         req.password = password;
         ApiClient.getApi().register(req).enqueue(new Callback<ApiService.LoginResponse>() {
             @Override
