@@ -12,13 +12,15 @@
         android:theme="@style/Theme.Messenger"
         android:usesCleartextTraffic="true">
         
-        <activity android:name=".LoginActivity" android:exported="true">
+        <!-- СТАРТОВАЯ АКТИВНОСТЬ: вход через телефон -->
+        <activity android:name=".PhoneVerificationActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
+        <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".ChatActivity" />
@@ -33,9 +35,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-    </application>
-
-</manifest>
     </application>
 
 </manifest>
