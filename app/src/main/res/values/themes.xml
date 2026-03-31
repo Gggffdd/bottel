@@ -4,5 +4,10 @@
         <item name="colorPrimaryVariant">#2b89d6</item>
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorSecondary">#3399ff</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:editTextColor">@color/black</item>
+        <item name="android:textColorHint">#8E8E93</item>
     </style>
 </resources>
