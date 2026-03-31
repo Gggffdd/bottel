@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ public class ChatsFragment extends Fragment {
     private List<ApiService.UserSearchResult> userList = new ArrayList<>();
     private PreferencesManager prefManager;
     private EditText etSearch;
+    private TextView tvEmptyResults;
 
     @Nullable
     @Override
@@ -43,20 +45,40 @@ public class ChatsFragment extends Fragment {
         
         rvUsers = view.findViewById(R.id.rvUsers);
         etSearch = view.findViewById(R.id.etSearch);
+        tvEmptyResults = view.findViewById(R.id.tvEmptyResults);
         
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new UsersAdapter(userList, user -> {
             Intent intent = new Intent(getContext(), ChatActivity.class);
             intent.putExtra("withUser", user.username);
+            intent.putExtra("withUserName", user.displayName != null ? user.displayName : user.username);
             startActivity(intent);
         });
         rvUsers.setAdapter(adapter);
         
+        // Поиск при вводе текста
         etSearch.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-                searchUsers(s.toString());
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            
+            @Override
+            public void afterTextChanged(Editable s) {
+                String query = s.toString().trim();
+                if (query.isEmpty()) {
+                    // Если поиск пустой, показываем пустой список
+                    userList.clear();
+                    adapter.notifyDataSetChanged();
+                    showEmptyResults(false);
+                } else {
+                    // Убираем символ @ в начале, если есть
+                    if (query.startsWith("@")) {
+                        query = query.substring(1);
+                    }
+                    searchUsers(query);
+                }
             }
         });
         
@@ -67,8 +89,14 @@ public class ChatsFragment extends Fragment {
         if (query.isEmpty()) {
             userList.clear();
             adapter.notifyDataSetChanged();
+            showEmptyResults(false);
             return;
         }
+        
+        // Показываем индикатор загрузки
+        tvEmptyResults.setText("Поиск...");
+        tvEmptyResults.setVisibility(View.VISIBLE);
+        
         ApiClient.getApi().searchUsers("Bearer " + prefManager.getToken(), query).enqueue(new Callback<List<ApiService.UserSearchResult>>() {
             @Override
             public void onResponse(Call<List<ApiService.UserSearchResult>> call, Response<List<ApiService.UserSearchResult>> response) {
@@ -76,12 +104,31 @@ public class ChatsFragment extends Fragment {
                     userList.clear();
                     userList.addAll(response.body());
                     adapter.notifyDataSetChanged();
+                    
+                    // Показываем сообщение, если результатов нет
+                    showEmptyResults(userList.isEmpty());
+                } else {
+                    showEmptyResults(true);
+                    Toast.makeText(getContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show();
                 }
             }
+            
             @Override
             public void onFailure(Call<List<ApiService.UserSearchResult>> call, Throwable t) {
-                Toast.makeText(getContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show();
+                showEmptyResults(true);
+                Toast.makeText(getContext(), "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    
+    private void showEmptyResults(boolean show) {
+        if (show) {
+            tvEmptyResults.setText("🔍 Ничего не найдено\nПопробуйте другой запрос");
+            tvEmptyResults.setVisibility(View.VISIBLE);
+            rvUsers.setVisibility(View.GONE);
+        } else {
+            tvEmptyResults.setVisibility(View.GONE);
+            rvUsers.setVisibility(View.VISIBLE);
+        }
     }
 }
