@@ -6,70 +6,72 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="#ffffff">
+    android:background="@color/white">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Messenger"
+        android:text="Вход"
         android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="#3399ff"
-        android:layout_marginBottom="48dp" />
+        android:textColor="@color/telegram_blue"
+        android:layout_marginBottom="32dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Номер телефона (+71234567890)"
+        android:hint="Email"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:boxStrokeColor="#3399ff"
-        app:hintTextColor="#3399ff"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp">
+        app:boxStrokeColor="@color/telegram_blue"
+        app:hintTextColor="@color/telegram_blue">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPhone"
+            android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:textColor="#000000"
-            android:textColorHint="#8E8E93" />
+            android:inputType="textEmailAddress"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btnSendCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Отправить код"
+        android:backgroundTint="@color/telegram_blue"
+        android:layout_marginTop="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Пароль"
+        android:hint="Код из письма"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:passwordToggleEnabled="true"
-        app:boxStrokeColor="#3399ff"
-        app:hintTextColor="#3399ff"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp">
+        app:boxStrokeColor="@color/telegram_blue"
+        app:hintTextColor="@color/telegram_blue"
+        android:layout_marginTop="24dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPassword"
+            android:id="@+id/etCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:textColor="#000000"
-            android:textColorHint="#8E8E93" />
+            android:inputType="number"
+            android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnVerify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Войти"
-        android:backgroundTint="#3399ff"
-        android:layout_marginTop="24dp" />
+        android:text="Подтвердить"
+        android:backgroundTint="@color/telegram_blue"
+        android:enabled="false"
+        android:layout_marginTop="16dp" />
 
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Регистрация"
-        android:backgroundTint="#e4e6eb"
-        android:textColor="#3399ff"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="16dp"
+        android:textSize="12sp"
+        android:textColor="@color/gray_text" />
 </LinearLayout>
