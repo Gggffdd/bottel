@@ -3,6 +3,7 @@ package com.example.messenger;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import retrofit2.Response;
 
 public class EmailVerificationActivity extends AppCompatActivity {
 
+    private static final String TAG = "EmailVerification";
     private EditText etEmail, etCode;
     private Button btnSendCode, btnVerify;
     private TextView tvStatus;
@@ -29,8 +31,11 @@ public class EmailVerificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_verification);
 
+        Log.d(TAG, "onCreate: started");
+
         // Проверяем, не залогинен ли уже пользователь
         if (prefManager.isLoggedIn()) {
+            Log.d(TAG, "onCreate: already logged in, redirecting to MainActivity");
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
@@ -46,6 +51,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
         btnVerify.setOnClickListener(v -> verifyCode());
         
         etEmail.requestFocus();
+        Log.d(TAG, "onCreate: ready");
     }
     
     private void applyTheme() {
@@ -59,6 +65,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
     private void sendCode() {
         String email = etEmail.getText().toString().trim();
+        Log.d(TAG, "sendCode: email=" + email);
         
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Введите email");
@@ -79,22 +86,26 @@ public class EmailVerificationActivity extends AppCompatActivity {
         ApiClient.getApi().sendCode(req).enqueue(new Callback<ApiService.SimpleResponse>() {
             @Override
             public void onResponse(Call<ApiService.SimpleResponse> call, Response<ApiService.SimpleResponse> response) {
+                Log.d(TAG, "sendCode onResponse: " + response.code());
                 if (response.isSuccessful() && response.body() != null && response.body().success) {
                     tvStatus.setText("Код отправлен на " + email);
                     btnSendCode.setEnabled(false);
                     btnVerify.setEnabled(true);
                     etCode.requestFocus();
                     Toast.makeText(EmailVerificationActivity.this, "Код отправлен! Проверьте почту", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "sendCode: code sent successfully");
                 } else {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Ошибка";
                     tvStatus.setText(msg);
                     btnSendCode.setEnabled(true);
                     Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "sendCode: error - " + msg);
                 }
             }
 
             @Override
             public void onFailure(Call<ApiService.SimpleResponse> call, Throwable t) {
+                Log.e(TAG, "sendCode onFailure: " + t.getMessage());
                 tvStatus.setText("Ошибка сети");
                 btnSendCode.setEnabled(true);
                 Toast.makeText(EmailVerificationActivity.this, "Ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
@@ -105,6 +116,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
     private void verifyCode() {
         String email = etEmail.getText().toString().trim();
         String code = etCode.getText().toString().trim();
+        Log.d(TAG, "verifyCode: email=" + email + ", code=" + code);
 
         if (TextUtils.isEmpty(code)) {
             etCode.setError("Введите код");
@@ -126,8 +138,10 @@ public class EmailVerificationActivity extends AppCompatActivity {
         ApiClient.getApi().verifyCode(req).enqueue(new Callback<ApiService.VerifyCodeResponse>() {
             @Override
             public void onResponse(Call<ApiService.VerifyCodeResponse> call, Response<ApiService.VerifyCodeResponse> response) {
+                Log.d(TAG, "verifyCode onResponse: " + response.code());
                 if (response.isSuccessful() && response.body() != null && response.body().success) {
                     ApiService.VerifyCodeResponse resp = response.body();
+                    Log.d(TAG, "verifyCode: success! token=" + resp.token);
                     
                     // Сохраняем данные пользователя
                     if (resp.user != null) {
@@ -140,19 +154,24 @@ public class EmailVerificationActivity extends AppCompatActivity {
                             resp.user.avatar != null ? resp.user.avatar : "",
                             resp.user.theme != null ? resp.user.theme : "light"
                         );
+                        Log.d(TAG, "verifyCode: user saved - " + resp.user.username);
                     } else {
                         prefManager.saveUser(email, resp.token);
+                        Log.d(TAG, "verifyCode: user saved with token");
                     }
                     
                     Toast.makeText(EmailVerificationActivity.this, "Вход выполнен!", Toast.LENGTH_SHORT).show();
                     
                     // Переход в главное меню
+                    Log.d(TAG, "verifyCode: starting MainActivity");
                     Intent intent = new Intent(EmailVerificationActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    Log.d(TAG, "verifyCode: startActivity called, finishing");
                     finish();
                 } else {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Неверный код";
+                    Log.e(TAG, "verifyCode: error - " + msg);
                     tvStatus.setText(msg);
                     btnVerify.setEnabled(true);
                     Toast.makeText(EmailVerificationActivity.this, msg, Toast.LENGTH_LONG).show();
@@ -161,6 +180,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiService.VerifyCodeResponse> call, Throwable t) {
+                Log.e(TAG, "verifyCode onFailure: " + t.getMessage());
                 tvStatus.setText("Ошибка сети");
                 btnVerify.setEnabled(true);
                 Toast.makeText(EmailVerificationActivity.this, "Ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
