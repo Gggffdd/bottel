@@ -12,7 +12,7 @@
         android:theme="@style/Theme.Messenger"
         android:usesCleartextTraffic="true">
         
-        <activity android:name=".EmailVerificationActivity" android:exported="true">
+        <activity android:name=".AuthActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
