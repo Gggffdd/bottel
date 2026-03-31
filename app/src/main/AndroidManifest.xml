@@ -12,8 +12,7 @@
         android:theme="@style/Theme.Messenger"
         android:usesCleartextTraffic="true">
         
-        <!-- СТАРТОВАЯ АКТИВНОСТЬ: вход через телефон -->
-        <activity android:name=".PhoneVerificationActivity" android:exported="true">
+        <activity android:name=".EmailVerificationActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
