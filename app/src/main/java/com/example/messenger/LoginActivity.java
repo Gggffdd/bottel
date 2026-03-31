@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<ApiService.LoginResponse> call, Response<ApiService.LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().success) {
                     prefManager.saveUser(response.body().username, response.body().token);
+                    prefManager.saveDisplayName(response.body().displayName);
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 } else {
@@ -68,6 +69,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<ApiService.LoginResponse> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "Сетевая ошибка: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
+        });
+    }
+}
         });
     }
 }
