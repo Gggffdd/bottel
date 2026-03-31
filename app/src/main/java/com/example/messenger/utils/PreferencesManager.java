@@ -12,6 +12,7 @@ public class PreferencesManager {
     private static final String KEY_BIO = "bio";
     private static final String KEY_BIRTHDAY = "birthday";
     private static final String KEY_AVATAR_URI = "avatar_uri";
+    private static final String KEY_THEME = "theme";
     private static final String KEY_NOTIFICATIONS = "notifications";
     private static final String KEY_SOUND = "sound";
 
@@ -27,6 +28,18 @@ public class PreferencesManager {
         prefs.edit()
             .putString(KEY_EMAIL, email)
             .putString(KEY_TOKEN, token)
+            .apply();
+    }
+
+    public void saveUserData(String email, String username, String displayName, String bio, String birthday, String avatar, String theme) {
+        prefs.edit()
+            .putString(KEY_EMAIL, email)
+            .putString(KEY_USERNAME, username)
+            .putString(KEY_DISPLAY_NAME, displayName)
+            .putString(KEY_BIO, bio)
+            .putString(KEY_BIRTHDAY, birthday)
+            .putString(KEY_AVATAR_URI, avatar)
+            .putString(KEY_THEME, theme)
             .apply();
     }
 
@@ -88,6 +101,16 @@ public class PreferencesManager {
 
     public String getAvatarUri() {
         return prefs.getString(KEY_AVATAR_URI, "");
+    }
+
+    // ========== ТЕМА ==========
+
+    public void saveTheme(String theme) {
+        prefs.edit().putString(KEY_THEME, theme).apply();
+    }
+
+    public String getTheme() {
+        return prefs.getString(KEY_THEME, "light");
     }
 
     // ========== НАСТРОЙКИ ==========
