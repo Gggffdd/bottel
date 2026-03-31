@@ -9,10 +9,23 @@
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Поиск по @username"
+        android:hint="Поиск по @username или имени"
         android:padding="12dp"
         android:layout_margin="8dp"
-        android:background="@drawable/border" />
+        android:background="@drawable/border"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="8dp" />
+
+    <TextView
+        android:id="@+id/tvEmptyResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/gray_text"
+        android:visibility="gone"
+        android:padding="32dp"
+        android:text="🔍 Ничего не найдено\nПопробуйте другой запрос" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsers"
