@@ -33,7 +33,6 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: started");
 
-        // Проверяем, не залогинен ли уже пользователь
         if (prefManager.isLoggedIn()) {
             Log.d(TAG, "onCreate: already logged in, redirecting to MainActivity");
             startActivity(new Intent(this, MainActivity.class));
@@ -143,7 +142,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     ApiService.VerifyCodeResponse resp = response.body();
                     Log.d(TAG, "verifyCode: success! token=" + resp.token);
                     
-                    // Сохраняем данные пользователя
+                    // Сохраняем токен
                     if (resp.user != null) {
                         prefManager.saveUserData(
                             resp.user.email,
@@ -160,9 +159,12 @@ public class EmailVerificationActivity extends AppCompatActivity {
                         Log.d(TAG, "verifyCode: user saved with token");
                     }
                     
+                    // Проверяем, что сохранилось
+                    String savedToken = prefManager.getToken();
+                    Log.d(TAG, "Saved token: " + savedToken);
+                    Log.d(TAG, "isLoggedIn after save: " + prefManager.isLoggedIn());
+                    
                     Toast.makeText(EmailVerificationActivity.this, "Вход выполнен!", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(EmailVerificationActivity.this, "Переход в MainActivity...", Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "verifyCode: starting MainActivity");
                     
                     // Переход в главное меню
                     Intent intent = new Intent(EmailVerificationActivity.this, MainActivity.class);
@@ -170,7 +172,6 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     startActivity(intent);
                     Log.d(TAG, "verifyCode: startActivity called");
                     finish();
-                    Log.d(TAG, "verifyCode: finish called");
                 } else {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Неверный код";
                     Log.e(TAG, "verifyCode: error - " + msg);
