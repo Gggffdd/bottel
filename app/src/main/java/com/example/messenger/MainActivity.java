@@ -25,7 +25,10 @@ public class MainActivity extends AppCompatActivity {
         
         prefManager = new PreferencesManager(this);
         
-        // Проверяем, залогинен ли пользователь
+        // Проверяем токен
+        Log.d(TAG, "Token from prefs: " + prefManager.getToken());
+        Log.d(TAG, "isLoggedIn: " + prefManager.isLoggedIn());
+        
         if (!prefManager.isLoggedIn()) {
             Log.d(TAG, "User not logged in, redirecting to AuthActivity");
             startActivity(new Intent(this, AuthActivity.class));
@@ -41,8 +44,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         Log.d(TAG, "bottomNavigationView found: " + (bottomNavigationView != null));
         
-        // Диагностический тост
-        Toast.makeText(this, "MainActivity запущена. Загружаю Чаты...", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Добро пожаловать, " + prefManager.getDisplayName(), Toast.LENGTH_LONG).show();
         
         // Загружаем фрагмент чатов по умолчанию
         loadFragment(new ChatsFragment());
