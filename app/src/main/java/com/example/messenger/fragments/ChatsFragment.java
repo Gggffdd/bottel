@@ -41,22 +41,21 @@ public class ChatsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         
-        prefManager = new PreferencesManager(getContext());
+        prefManager = new PreferencesManager(requireContext());
         
         rvUsers = view.findViewById(R.id.rvUsers);
         etSearch = view.findViewById(R.id.etSearch);
         tvEmptyResults = view.findViewById(R.id.tvEmptyResults);
         
-        rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvUsers.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new UsersAdapter(userList, user -> {
-            Intent intent = new Intent(getContext(), ChatActivity.class);
+            Intent intent = new Intent(requireContext(), ChatActivity.class);
             intent.putExtra("withUser", user.username);
             intent.putExtra("withUserName", user.displayName != null ? user.displayName : user.username);
             startActivity(intent);
         });
         rvUsers.setAdapter(adapter);
         
-        // Поиск при вводе текста
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -68,12 +67,10 @@ public class ChatsFragment extends Fragment {
             public void afterTextChanged(Editable s) {
                 String query = s.toString().trim();
                 if (query.isEmpty()) {
-                    // Если поиск пустой, показываем пустой список
                     userList.clear();
                     adapter.notifyDataSetChanged();
                     showEmptyResults(false);
                 } else {
-                    // Убираем символ @ в начале, если есть
                     if (query.startsWith("@")) {
                         query = query.substring(1);
                     }
@@ -93,7 +90,6 @@ public class ChatsFragment extends Fragment {
             return;
         }
         
-        // Показываем индикатор загрузки
         tvEmptyResults.setText("Поиск...");
         tvEmptyResults.setVisibility(View.VISIBLE);
         
@@ -104,19 +100,17 @@ public class ChatsFragment extends Fragment {
                     userList.clear();
                     userList.addAll(response.body());
                     adapter.notifyDataSetChanged();
-                    
-                    // Показываем сообщение, если результатов нет
                     showEmptyResults(userList.isEmpty());
                 } else {
                     showEmptyResults(true);
-                    Toast.makeText(getContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show();
                 }
             }
             
             @Override
             public void onFailure(Call<List<ApiService.UserSearchResult>> call, Throwable t) {
                 showEmptyResults(true);
-                Toast.makeText(getContext(), "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
