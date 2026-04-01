@@ -3,6 +3,7 @@ package com.example.messenger.fragments;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
+    private static final String TAG = "ProfileFragment";
     private CircleImageView ivAvatar;
     private TextView tvDisplayName, tvUsername, tvBio, tvBirthday;
     private Button btnEditProfile;
@@ -33,6 +35,8 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView started");
+        
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         
         prefManager = new PreferencesManager(getContext());
@@ -54,6 +58,7 @@ public class ProfileFragment extends Fragment {
         
         loadProfile();
         
+        Log.d(TAG, "onCreateView finished");
         return view;
     }
     
@@ -67,9 +72,12 @@ public class ProfileFragment extends Fragment {
         String token = prefManager.getToken();
         if (token == null) return;
         
+        Log.d(TAG, "loadProfile: token exists");
+        
         ApiClient.getApi().getProfile("Bearer " + token).enqueue(new Callback<ApiService.ProfileResponse>() {
             @Override
             public void onResponse(Call<ApiService.ProfileResponse> call, Response<ApiService.ProfileResponse> response) {
+                Log.d(TAG, "loadProfile onResponse: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     ApiService.ProfileResponse profile = response.body();
                     tvDisplayName.setText(profile.displayName != null ? profile.displayName : profile.username);
@@ -89,10 +97,13 @@ public class ProfileFragment extends Fragment {
                     prefManager.saveBio(profile.bio);
                     prefManager.saveBirthday(profile.birthday);
                     if (profile.avatar != null) prefManager.saveAvatarUri(profile.avatar);
+                    
+                    Log.d(TAG, "Profile loaded: " + profile.username);
                 }
             }
             @Override
             public void onFailure(Call<ApiService.ProfileResponse> call, Throwable t) {
+                Log.e(TAG, "loadProfile onFailure: " + t.getMessage());
                 Toast.makeText(getContext(), "Ошибка загрузки профиля", Toast.LENGTH_SHORT).show();
             }
         });
