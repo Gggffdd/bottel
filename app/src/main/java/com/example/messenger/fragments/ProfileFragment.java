@@ -44,7 +44,6 @@ public class ProfileFragment extends Fragment {
         tvBirthday = view.findViewById(R.id.tvBirthday);
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
         
-        // Добавляем обводку с плюсиком для аватарки
         ivAvatar.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), ProfileEditActivity.class));
         });
@@ -85,7 +84,6 @@ public class ProfileFragment extends Fragment {
                                 .into(ivAvatar);
                     }
                     
-                    // Сохраняем в Preferences
                     prefManager.saveDisplayName(profile.displayName);
                     prefManager.saveUsername(profile.username);
                     prefManager.saveBio(profile.bio);
