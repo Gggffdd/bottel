@@ -161,14 +161,16 @@ public class EmailVerificationActivity extends AppCompatActivity {
                     }
                     
                     Toast.makeText(EmailVerificationActivity.this, "Вход выполнен!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EmailVerificationActivity.this, "Переход в MainActivity...", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "verifyCode: starting MainActivity");
                     
                     // Переход в главное меню
-                    Log.d(TAG, "verifyCode: starting MainActivity");
                     Intent intent = new Intent(EmailVerificationActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                    Log.d(TAG, "verifyCode: startActivity called, finishing");
+                    Log.d(TAG, "verifyCode: startActivity called");
                     finish();
+                    Log.d(TAG, "verifyCode: finish called");
                 } else {
                     String msg = response.body() != null && response.body().error != null ? response.body().error : "Неверный код";
                     Log.e(TAG, "verifyCode: error - " + msg);
