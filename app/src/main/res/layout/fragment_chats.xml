@@ -14,7 +14,9 @@
         android:layout_margin="8dp"
         android:background="@drawable/border"
         android:drawableStart="@drawable/ic_search"
-        android:drawablePadding="8dp" />
+        android:drawablePadding="8dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_text" />
 
     <TextView
         android:id="@+id/tvEmptyResults"
